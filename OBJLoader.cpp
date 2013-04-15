@@ -2,7 +2,7 @@
 
 // Construction
 //-----------------------------------------------------------------------------
-OBJLoader::OBJLoader( std::string& fname )
+OBJLoader::OBJLoader( const std::string& fname )
 {
 
 }

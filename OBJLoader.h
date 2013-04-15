@@ -21,13 +21,20 @@ public: // Construction
 	 *@pre none
 	 *@post Either an object will be constructed or an exception will be raised
 	 */
-	OBJLoader( std::string& fname );
+	OBJLoader( const std::string& fname );
+
+	/** Free virtual memory
+	 */
+	~OBJLoader();
 
 
 public: // Public interface
 
-
-std::vector< vec3 >& verticies();
+	/** Get reference to the .OBJ vector which contains all of the verticies.
+	 *@param none
+	 *@return Reference to the vector holding the verticies
+	 */
+	std::vector< vec3 >& verticies();
 
 
 private: // class members
