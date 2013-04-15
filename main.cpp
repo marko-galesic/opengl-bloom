@@ -22,6 +22,6 @@ int main( int argc, const char* argv[])
 
 	// Extract file name & Read .obj file
 	std::string fname(argv[OBJP_INDEX]);
-	
+	OBJLoader obj(fname);
 	
 }
