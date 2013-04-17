@@ -78,7 +78,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="separable.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Matrix.hpp" />
+    <ClInclude Include="include\OBJLoader.h" />
+    <ClInclude Include="include\os.h" />
+    <ClInclude Include="include\ph.h" />
+    <ClInclude Include="include\Vector.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

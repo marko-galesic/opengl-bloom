@@ -5,7 +5,7 @@
 #include <string>
 #include <iostream>
 
-#include "OBJLoader.h"
+#include "include/OBJLoader.h"
 
 #define MIN_ARGS 2
 #define OBJP_INDEX 1
