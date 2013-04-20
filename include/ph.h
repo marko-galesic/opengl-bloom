@@ -2,7 +2,6 @@
 // Brief: Declares "Philip's GL utility API", or "ph" for short.
 
 #pragma once
-#include "GL/glew.h"
 
 #define PH_PI (3.14159265358979323846f)
 

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,9 +7,14 @@
 #include <time.h>
 #include <math.h>
 #include <iostream>
-#define __MATH__
-#define __VECT__
-#define _STRING_
+#include <fstream>
+#include <vector>
+
+#include "GL\glew.h"
+#include "Vector.hpp"
+#include "Matrix.hpp"
+
+#define _MATH_
 
 #ifdef __cplusplus
 extern "C" 

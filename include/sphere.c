@@ -1,3 +1,5 @@
+#pragma once
+
 #define VERT_COUNT (162)
 #define FACE_COUNT (320)
 

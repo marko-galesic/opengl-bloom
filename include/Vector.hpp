@@ -1,6 +1,8 @@
-#ifndef __MATH__
-#define __MATH__
-#include <math.h>
+#pragma once
+
+#ifndef _MATH_
+	#define _MATH_
+	#include <math.h>
 #endif
 
 const float Pi = 4 * std::atan(1.0f);
