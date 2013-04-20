@@ -14,6 +14,7 @@
 #include "Vector.hpp"
 #include "Matrix.hpp"
 
+
 #define _MATH_
 
 #ifdef __cplusplus
