@@ -18,6 +18,9 @@
     <ClCompile Include="separable.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\sphere.c">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\OBJLoader.h">
@@ -29,10 +32,10 @@
     <ClInclude Include="include\ph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Vector.h">
+    <ClInclude Include="include\Matrix.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Matrix.h">
+    <ClInclude Include="include\Vector.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

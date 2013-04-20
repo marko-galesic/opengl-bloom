@@ -1,8 +1,13 @@
 #ifndef OBJLoader_H
 #define OBJLoader_H
 
-#include <string>
 #include <fstream>
+
+#ifndef _STRING_
+#define _STRING_
+#include <string>
+#endif
+
 #include <vector>
 
 #include "Vector.hpp"

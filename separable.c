@@ -1,6 +1,3 @@
-#include <string>
-#include <iostream>
-
 #include "include/os.h"
 #include "include/ph.h"
 #include "include/sphere.c"
@@ -317,7 +314,7 @@ int main(int argc, char** argv)
 {
 	if(argc < MIN_ARGS)
 	{
-		std::cerr << MIN_ARG_ERROR << std::endl;
+		std::cout << MIN_ARG_ERROR << std::endl;
 		exit(1);
 	}
 
