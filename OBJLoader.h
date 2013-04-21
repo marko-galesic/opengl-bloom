@@ -34,13 +34,18 @@ public: // Public interface
 	 *@param none
 	 *@return Reference to the vector holding the verticies
 	 */
-	std::vector< vec3 >& verticies();
+	const vec3* vertices_ptr() const;
+
+	/** The the number of vetices.
+	 *@return the number of vertices.
+	 */
+	int vertice_count() const;
 
 
 private: // class members
 
 	/**	Stores verticies read in from .OBJ file 
 	*/
-	std::vector< vec3 > verticies;
+	std::vector< vec3 > vertices;
 };
 #endif // !OBJLoader_H
