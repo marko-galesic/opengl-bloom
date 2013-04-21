@@ -37,6 +37,11 @@ extern "C"{
 		glFlush();
 	}
 
+	void keyboardListener(unsigned char key, int x, int y)
+	{
+		printf("Key Hit %c\n", key);
+	}
+
 };
 
 int main( int argc, const char* argv[])
@@ -65,6 +70,7 @@ int main( int argc, const char* argv[])
 	glutCreateWindow(WINDOW_TITLE);
 	init();
 	glutDisplayFunc(draw);
+	glutKeyboardFunc(keyboardListener);
 	glutMainLoop();
 	return(0);
 }
