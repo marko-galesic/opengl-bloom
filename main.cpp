@@ -54,23 +54,33 @@ int main( int argc, const char* argv[])
 		exit(1);
 	}
 
-	// Extract file name & Read .obj file
+	// Extract file name
 	std::string fname(argv[OBJP_INDEX]);
-	OBJLoader obj(fname);
 
-	// Extract OBJ information
-	vertices_ptr = (vec3*) obj.vertices_ptr();
-	vertice_count= obj.vertice_count();
+	try{
+		// Load .OBJ
+		OBJLoader obj;
+		obj.loadOBJ(fname);
 
-	// Setup glut
-	glutInit(&argc,(char**)&argv);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowSize(WINDOW_W, WINDOW_H);
-	glutInitWindowPosition(WINDOW_X, WINDOW_Y);
-	glutCreateWindow(WINDOW_TITLE);
-	init();
-	glutDisplayFunc(draw);
-	glutKeyboardFunc(keyboardListener);
-	glutMainLoop();
-	return(0);
+		// Extract OBJ information
+		vertices_ptr = (vec3*) obj.vertices_ptr();
+		vertice_count= obj.vertice_count();
+
+		// Setup glut
+		glutInit(&argc,(char**)&argv);
+		glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+		glutInitWindowSize(WINDOW_W, WINDOW_H);
+		glutInitWindowPosition(WINDOW_X, WINDOW_Y);
+		glutCreateWindow(WINDOW_TITLE);
+		init();
+		glutDisplayFunc(draw);
+		glutKeyboardFunc(keyboardListener);
+		glutMainLoop();
+		return(0);
+	} catch( std::runtime_error& err ) {
+		std::cerr << "Error: Failed to load file(" << fname.c_str() << ")\n";
+		std::cerr << err.what() << std::endl;
+		system("pause");
+		return (1);
+	}
 }
