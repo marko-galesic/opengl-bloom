@@ -21,15 +21,21 @@ public: // Construction
 
 	/** Construct an .OBJ file with a given file.
 	 *@param The path to the given .OBJ file.
-	 *@pre none
-	 *@post Either an object will be constructed or an exception will be raised
 	 */
-	OBJLoader( const std::string& fname );
+	OBJLoader();
 
 	/** Free virtual memory
 	 */
 	~OBJLoader();
 
+public: // Load .OBJ file
+
+	/** Load the .OBJ file. If loading fails an exception
+	 *  is raised.
+	 *@param The .OBJ file path
+	 *@throw std::runtime_exception
+	 */
+	void loadOBJ( const std::string& fname );
 
 public: // Public interface
 
@@ -44,6 +50,6 @@ private: // class members
 
 	/**	Stores verticies read in from .OBJ file 
 	*/
-	std::vector< vec3 > verticies;
+	std::vector< vec3 > vertices;
 };
 #endif // !OBJLoader_H

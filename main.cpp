@@ -1,26 +1,33 @@
-// 
-// driver1
-//
-// Template test harness for demo shaders.
-//
-#include <GL/glew.h> // Include the GLEW header file
-#include <GL/glut.h> // Include the GLUT header file
-#include <iostream> // Allow us to print to the console
+/*
+ * Bloom - Shading Project
+ * 
+ * Frederick Kelch & Marko Galesic
+ *
+ * Some code taken from lab0 and Swiftless tutorials
+ */
+#include <GL/glew.h>	// Include the GLEW header file
+#include <GL/glut.h>	// Include the GLUT header file
+#include <iostream>		// Allow us to print to the console
+#include "OBJLoader.h"
 
-unsigned int fbo; // The frame buffer object
-unsigned int fbo_depth; // The depth buffer for the frame buffer object
-unsigned int fbo_texture; // The texture object to write our frame buffer object to
-
-int window_width = 500; // The width of our window
-int window_height = 500; // The height of our window
-
-int windowHeight = 500;	// Current height of window
-int windowWidth  = 500;	// Current width of window
+unsigned int fbo;			// The frame buffer object
+unsigned int fbo_depth;		// The depth buffer for the frame buffer object
+unsigned int fbo_texture;	// The texture object to write our frame buffer object to
 
 GLUquadricObj *sphere1 = NULL;
 GLUquadricObj *sphere2 = NULL;
 GLUquadricObj *sphere3 = NULL;
 
+#define WINDOW_H 600
+#define WINDOW_W 800
+#define WINDOW_X 0
+#define WINDOW_Y 0
+#define WINDOW_TITLE "Bloom - Shading Project"
+
+
+// Because GLUT doesn't like objects
+static vec3* vertices_ptr;
+static int vertice_count;
 GLuint phong_program;
 
 // Muted material properties
@@ -54,7 +61,7 @@ extern "C" {
 	void display( void ) {
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);			// Bind our frame buffer for rendering
 		glPushAttrib(GL_VIEWPORT_BIT | GL_ENABLE_BIT);			// Push our glEnable and glViewport states
-		glViewport(0, 0, window_width, window_height);			// Set the size of the frame buffer view port
+		glViewport(0, 0, WINDOW_W, WINDOW_H);			// Set the size of the frame buffer view port
 
 		glClearColor (0.0f, 0.0f, 0.0f, 1.0f);					// Set the clear colour
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear the depth and colour buffers
@@ -146,8 +153,8 @@ extern "C" {
 	void reshape( int width, int height ) {
 
 		glViewport( 0, 0, width, height );
-		windowWidth = width;
-		windowHeight = height;
+		WINDOW_W = width;
+		WINDOW_H = height;
 
 	}
 
@@ -178,7 +185,7 @@ void initFrameBufferDepthBuffer(void) {
 	glGenRenderbuffersEXT(1, &fbo_depth); // Generate one render buffer and store the ID in fbo_depth
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo_depth); // Bind the fbo_depth render buffer
 
-	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, window_width, window_height); // Set the render buffer storage to be a depth component, with a width and height of the window
+	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, WINDOW_W, WINDOW_H); // Set the render buffer storage to be a depth component, with a width and height of the window
 
 	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo_depth); // Set the render buffer of this buffer to the depth buffer
 
@@ -189,7 +196,7 @@ void initFrameBufferTexture(void) {
 	glGenTextures(1, &fbo_texture); // Generate one texture
 	glBindTexture(GL_TEXTURE_2D, fbo_texture); // Bind the texture fbo_texture
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window_width, window_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); // Create a standard texture with the width and height of our window
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WINDOW_W, WINDOW_H, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); // Create a standard texture with the width and height of our window
 
 	// Setup the basic texture parameters
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -273,16 +280,12 @@ void init( void ) {
 
 int main( int argc, char **argv ) {
 
-	// Initialize GLUT
-	glutInit( &argc, argv );
-
 	// Enable double buffering and depth buffering
 	glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
-	glutInitWindowSize( windowWidth, windowHeight );
+	glutInitWindowSize( WINDOW_W, WINDOW_H );
 	glutCreateWindow( "Shader Test Program 1" );
 
-	// Initialize glew
-	glewInit();
+	
 
 	// Callback functions
 	glutReshapeFunc( reshape );
@@ -291,9 +294,39 @@ int main( int argc, char **argv ) {
 
 	init();
 
-	// enter your display loop.
-	glutMainLoop();
+	// Extract file name
+	std::string fname(argv[OBJP_INDEX]);
 
-	return 0;
+	try{
+		// Load .OBJ
+		OBJLoader obj;
+		obj.loadOBJ(fname);
 
+		// Extract OBJ information
+		vertices_ptr = (vec3*) obj.vertices_ptr();
+		vertice_count= obj.vertice_count();
+
+		// Setup glut
+		glutInit(&argc,(char**)&argv);
+		glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+		glutInitWindowSize(WINDOW_W, WINDOW_H);
+		glutInitWindowPosition(WINDOW_X, WINDOW_Y);
+		glutCreateWindow(WINDOW_TITLE);
+
+		// Initialize glew
+		glewInit();
+
+		init();
+
+		glutDisplayFunc(display);
+		glutKeyboardFunc(keyboard);
+
+		glutMainLoop();
+		return(0);
+	} catch( std::runtime_error& err ) {
+		std::cerr << "Error: Failed to load file(" << fname.c_str() << ")\n";
+		std::cerr << err.what() << std::endl;
+		system("pause");
+		return (1);
+	}
 }

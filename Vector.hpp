@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __H_VECTOR_H
+#define __H_VECTOR_H
 #include <cmath>
 
 const float Pi = 4 * std::atan(1.0f);
@@ -222,3 +223,4 @@ typedef Vector4<int> ivec4;
 typedef Vector2<float> vec2;
 typedef Vector3<float> vec3;
 typedef Vector4<float> vec4;
+#endif

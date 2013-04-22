@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __H_MATRIX_H
+#define __H_MATRIX_H
 #include "Vector.hpp"
 
 template <typename T>
@@ -242,3 +243,4 @@ struct Matrix4 {
 typedef Matrix2<float> mat2;
 typedef Matrix3<float> mat3;
 typedef Matrix4<float> mat4;
+#endif
