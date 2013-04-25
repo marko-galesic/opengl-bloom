@@ -68,8 +68,6 @@ extern "C" {
 
 	void display( void ) {
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);			// Bind our frame buffer for rendering
-		glPushAttrib(GL_VIEWPORT_BIT | GL_ENABLE_BIT);			// Push our glEnable and glViewport states
-		glViewport(0, 0, WINDOW_W, WINDOW_H);                   // Set the size of the frame buffer view port
 
 		glClearColor (0.0f, 0.0f, 0.0f, 1.0f);					// Set the clear colour
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear the depth and colour buffers
@@ -158,7 +156,8 @@ extern "C" {
 	//
 
 	void reshape( int width, int height ) {
-		glViewport( 0, 0, width, height );
+        glViewport( 0, 0, width, height );
+
 	}
 
 	//
@@ -168,9 +167,7 @@ extern "C" {
 	//
 
 	void keyboard( unsigned char key, int x, int y ) {
-
 		switch( key ) {
-
 		case 'q': case 'Q': case 033:
 			exit( EXIT_SUCCESS );
 
@@ -243,7 +240,7 @@ void init( void ) {
 	gluPerspective( 45, 1.0, 1.0, 100.0 );
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
-	gluLookAt( 0.0, 0.0, 12.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 );
+	gluLookAt( 0.0, 0.0, 30.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 );
 
 	// switch on the light
 	glEnable( GL_LIGHTING );
@@ -283,6 +280,7 @@ int main( int argc,  const char *argv[] ) {
 		init();
 		glutDisplayFunc(display);
 		glutKeyboardFunc(keyboard);
+        glutReshapeFunc(reshape);
 		glutMainLoop();
 		return(0);
 	} catch( std::runtime_error& err ) {
