@@ -5,8 +5,14 @@
  *
  * Some code taken from lab0 and Swiftless tutorials
  */
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#include <OpenGL/glu.h>
+#include <GLUT/GLUT.h>
+#else
 #include <GL/glew.h>	// Include the GLEW header file
 #include <GL/glut.h>	// Include the GLUT header file
+#endif
 #include <iostream>		// Allow us to print to the console
 #include "OBJLoader.h"
 
@@ -23,6 +29,8 @@ GLUquadricObj *sphere3 = NULL;
 #define WINDOW_X 0
 #define WINDOW_Y 0
 #define WINDOW_TITLE "Bloom - Shading Project"
+
+#define OBJ_INDEX 1
 
 
 // Because GLUT doesn't like objects
@@ -153,9 +161,6 @@ extern "C" {
 	void reshape( int width, int height ) {
 
 		glViewport( 0, 0, width, height );
-		WINDOW_W = width;
-		WINDOW_H = height;
-
 	}
 
 	//
@@ -295,7 +300,7 @@ int main( int argc, char **argv ) {
 	init();
 
 	// Extract file name
-	std::string fname(argv[OBJP_INDEX]);
+	std::string fname(argv[OBJ_INDEX]);
 
 	try{
 		// Load .OBJ
