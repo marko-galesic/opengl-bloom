@@ -9,6 +9,8 @@
 #include <GL/glew.h>	// Include the GLEW header file
 #include <GLUT/GLUT.h>
 #endif
+#include <GL/glew.h>
+#include <GL/glut.h>
 #include <iostream>		// Allow us to print to the console
 #include "OBJLoader.h"
 
