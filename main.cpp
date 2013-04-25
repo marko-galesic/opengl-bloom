@@ -73,7 +73,7 @@ extern "C" {
 
 		glClearColor (0.0f, 0.0f, 0.0f, 1.0f);					// Set the clear colour
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear the depth and colour buffers
-		glLoadIdentity();										// Reset the modelview matrix
+
 
 		glMaterialfv( GL_FRONT, GL_SPECULAR, spec );
 
@@ -126,7 +126,6 @@ extern "C" {
 		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);				// Clear the background of our window to red
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the colour buffer (more buffers later on)
 		glLoadIdentity();									// Load the Identity Matrix to reset our drawing locations
-
 		glTranslatef(0.0f, 0.0f, -2.0f);
 
 		glBindTexture(GL_TEXTURE_2D, fbo_texture);			// Bind our frame buffer texture
@@ -159,7 +158,6 @@ extern "C" {
 	//
 
 	void reshape( int width, int height ) {
-
 		glViewport( 0, 0, width, height );
 	}
 
@@ -186,7 +184,6 @@ extern "C" {
 
 
 void initFrameBufferDepthBuffer(void) {
-
 	glGenRenderbuffersEXT(1, &fbo_depth); // Generate one render buffer and store the ID in fbo_depth
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo_depth); // Bind the fbo_depth render buffer
 	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, WINDOW_W, WINDOW_H); // Set the render buffer storage to be a depth component, with a width and height of the window
@@ -211,29 +208,23 @@ void initFrameBufferTexture(void) {
 
 void initFrameBuffer(void) {
 	initFrameBufferDepthBuffer(); // Initialize our frame buffer depth buffer
-
 	initFrameBufferTexture(); // Initialize our frame buffer texture
-
 	glGenFramebuffersEXT(1, &fbo); // Generate one frame buffer and store the ID in fbo
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo); // Bind our frame buffer
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, fbo_texture, 0); // Attach the texture fbo_texture to the color buffer in our frame buffer
 	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo_depth); // Attach the depth buffer fbo_depth to our frame buffer
-
 	GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT); // Check that status of our generated frame buffer
-
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) // If the frame buffer does not report back as complete
 	{
 		std::cout << "Couldn't create frame buffer" << std::endl; // Output an error to the console
 		exit(0); // Exit the application
 	}
-
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0); // Unbind our frame buffer
 }
 
 
 
 // Light properties
-
 GLfloat pos[] = { 10.0, 10.0, 0.0, 0.0 };
 GLfloat amb[] = { 0.4, 0.4, 0.4, 1.0 };
 
@@ -252,7 +243,7 @@ void init( void ) {
 	gluPerspective( 45, 1.0, 1.0, 100.0 );
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
-	// doesn't seem to do anything - gluLookAt( 0.0, 0.0, 12.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 );
+	gluLookAt( 0.0, 0.0, 12.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 );
 
 	// switch on the light
 	glEnable( GL_LIGHTING );
@@ -267,7 +258,6 @@ void init( void ) {
 //
 // Main routine - GLUT setup and initialization
 //
-
 int main( int argc,  const char *argv[] ) {
 
     // Make sure we have the required arguments
@@ -281,7 +271,6 @@ int main( int argc,  const char *argv[] ) {
 	std::string fname(argv[OBJ_INDEX]);
 
 	try{
-
 		// Setup glut
 		glutInit(&argc,(char**)argv);
 		glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
