@@ -32,6 +32,8 @@ GLUquadricObj *sphere3 = NULL;
 #define OBJ_INDEX 1
 #define MIN_ARGS 2
 
+#define MARKO
+
 
 // Because GLUT doesn't like objects
 static vec3* vertices_ptr;
@@ -66,17 +68,20 @@ extern "C" {
 	//  shader will be applied to the wall.
 	//
 
-	void display( void ) {
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);			// Bind our frame buffer for rendering
 
+    
+    
+    void drawMarko(){
+       	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);			// Bind our frame buffer for rendering
+        
 		glClearColor (0.0f, 0.0f, 0.0f, 1.0f);					// Set the clear colour
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear the depth and colour buffers
-
-
+        
+        
 		glMaterialfv( GL_FRONT, GL_SPECULAR, spec );
-
+        
 		//glUseProgram( phong_program );
-
+        
 		// draw the red sphere
 		// create it if it doesn't already exist
 		if( !sphere1 ) {
@@ -89,7 +94,7 @@ extern "C" {
 		glMateriali( GL_FRONT, GL_SHININESS, shiny1 );
 		gluSphere( sphere1, 2, 100, 100 );
 		glPopMatrix();
-
+        
 		// draw the green sphere
 		// create it if it doesn't already exist
 		if( !sphere2 ) {
@@ -102,7 +107,7 @@ extern "C" {
 		glMateriali( GL_FRONT, GL_SHININESS, shiny2 );
 		gluSphere( sphere2, 2, 100, 100 );
 		glPopMatrix();
-
+        
 		// draw the blue sphere
 		// create it if it doesn't already exist
 		if( !sphere3 ) {
@@ -115,39 +120,52 @@ extern "C" {
 		glMateriali( GL_FRONT, GL_SHININESS, shiny3 );
 		gluSphere( sphere3, 2, 100, 100 );
 		glPopMatrix();
-
+        
 		glPopAttrib();										// Restore our glEnable and glViewport states
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);		// Unbind our texture
-
-
-
+        
+        
+        
 		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);				// Clear the background of our window to red
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the colour buffer (more buffers later on)
 		glLoadIdentity();									// Load the Identity Matrix to reset our drawing locations
 		glTranslatef(0.0f, 0.0f, -2.0f);
-
+        
 		glBindTexture(GL_TEXTURE_2D, fbo_texture);			// Bind our frame buffer texture
-
+        
 		glBegin(GL_QUADS);
-
+        
 		glTexCoord2f(0.0f, 0.0f);
 		glVertex3f(-1.0f, -1.0f, 0.0f);						// The bottom left corner
-
+        
 		glTexCoord2f(0.0f, 1.0f);
 		glVertex3f(-1.0f, 1.0f, 0.0f);						// The top left corner
-
+        
 		glTexCoord2f(1.0f, 1.0f);
 		glVertex3f(1.0f, 1.0f, 0.0f);						// The top right corner
-
+        
 		glTexCoord2f(1.0f, 0.0f);
 		glVertex3f(1.0f, -1.0f, 0.0f);						// The bottom right corner
-
+        
 		glEnd();
-
+        
 		glBindTexture(GL_TEXTURE_2D, 0);					// Unbind any textures
-
+        
 		glutSwapBuffers();
-
+ 
+    }
+    
+    
+    void drawFred(){
+        
+    }
+    
+    void display( void ) {
+#ifdef FREDDY
+        drawFred();
+#else
+        drawMarko();
+#endif
 	}
 
 
