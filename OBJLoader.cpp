@@ -59,5 +59,5 @@ const vec3* OBJLoader::vertices_ptr() const
 //-----------------------------------------------------------------------------
 int OBJLoader::vertice_count() const 
 {
-	return vertices.size();
+	return int(vertices.size());
 }

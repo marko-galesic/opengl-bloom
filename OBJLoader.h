@@ -43,7 +43,11 @@ public: // Public interface
 	 *@param none
 	 *@return Reference to the vector holding the verticies
 	 */
-	std::vector< vec3 >& vertBuffer();
+	const vec3* vertices_ptr() const;
+    
+    /**
+     */
+    int vertice_count() const;
 
 
 private: // class members
