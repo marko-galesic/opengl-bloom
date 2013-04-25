@@ -291,7 +291,6 @@ int main( int argc, char **argv ) {
 	glutCreateWindow( "Shader Test Program 1" );
 
 	
-
 	// Callback functions
 	glutReshapeFunc( reshape );
 	glutDisplayFunc( display );
