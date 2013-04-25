@@ -8,9 +8,10 @@
 #ifdef __APPLE__
 #include <GL/glew.h>	// Include the GLEW header file
 #include <GLUT/GLUT.h>
-#endif
+#else
 #include <GL/glew.h>
 #include <GL/glut.h>
+#endif
 #include <iostream>		// Allow us to print to the console
 #include "OBJLoader.h"
 
