@@ -1,5 +1,4 @@
 #include "OBJLoader.h"
-#define _CRT_SECURE_NO_WARNINGS
 
 // Construction
 //-----------------------------------------------------------------------------
@@ -44,20 +43,7 @@ void OBJLoader::loadOBJ( const std::string& fname )
 	}
 }
 
-
-// Get reference to the first vertici
-//-----------------------------------------------------------------------------
 const vec3* OBJLoader::vertices_ptr() const
 {
-	if(vertices.size() < 1)
-		return NULL;
-	return &vertices[0];
-}
-
-
-// Get reference to the first vertici
-//-----------------------------------------------------------------------------
-int OBJLoader::vertice_count() const 
-{
-	return int(vertices.size());
+    return NULL;
 }
