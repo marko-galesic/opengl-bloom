@@ -69,7 +69,7 @@ void OBJLoader::loadOBJ( const std::string& fname )
             std::cout << " " << faces[i].faces[0] << " " << faces[i].faces[1];
             std::cout << " " << faces[i].faces[2] << " " << faces[i].faces[3] << std::endl;
         } else {
-            std::cout << "Face (Quad) N V1 V2 V3\n" << faces[i].faceNumber;
+            std::cout << "Face (Triangle) N V1 V2 V3\n" << faces[i].faceNumber;
             std::cout << " " << faces[i].faces[0] << " " << faces[i].faces[1];
             std::cout << " " << faces[i].faces[2] << std::endl;
         }
@@ -79,13 +79,58 @@ void OBJLoader::loadOBJ( const std::string& fname )
 }//End method
 
 
-
-const vec3* OBJLoader::vertices_ptr() const
-{
-    return &(*vertices.begin());
-}
-
-const vec3* OBJLoader::normals_ptr()const
-{
-    return &(*(normals_ptr()));
+GLuint OBJLoader::generateDrawList(){
+    GLuint listNumber = glGenLists(1);
+    glNewList(listNumber, GL_COMPILE);
+    
+    // Draw Code
+    for (int i = 0; i < faces.size(); i++) {
+        if (faces[i].quad) {
+            glBegin(GL_QUADS);
+                glNormal3f(normals[faces[i].faceNumber-1].x,
+                           normals[faces[i].faceNumber-1].y,
+                           normals[faces[i].faceNumber-1].z);
+            
+                glVertex3f(vertices[faces[i].faces[0]-1].x,
+                           vertices[faces[i].faces[0]-1].y,
+                           vertices[faces[i].faces[0]-1].z);
+            
+                glVertex3f(vertices[faces[i].faces[1]-1].x,
+                           vertices[faces[i].faces[1]-1].y,
+                           vertices[faces[i].faces[1]-1].z);
+            
+                glVertex3f(vertices[faces[i].faces[2]-1].x,
+                           vertices[faces[i].faces[2]-1].y,
+                           vertices[faces[i].faces[2]-1].z);
+            
+                glVertex3f(vertices[faces[i].faces[3]-1].x,
+                           vertices[faces[i].faces[3]-1].y,
+                           vertices[faces[i].faces[3]-1].z);
+            glEnd();
+        } else {
+            glBegin(GL_TRIANGLES);
+                glNormal3f(normals[faces[i].faceNumber-1].x,
+                           normals[faces[i].faceNumber-1].y,
+                           normals[faces[i].faceNumber-1].z);
+            
+                glVertex3f(vertices[faces[i].faces[0]-1].x,
+                           vertices[faces[i].faces[0]-1].y,
+                           vertices[faces[i].faces[0]-1].z);
+            
+                glVertex3f(vertices[faces[i].faces[1]-1].x,
+                           vertices[faces[i].faces[1]-1].y,
+                           vertices[faces[i].faces[1]-1].z);
+            
+                glVertex3f(vertices[faces[i].faces[2]-1].x,
+                           vertices[faces[i].faces[2]-1].y,
+                           vertices[faces[i].faces[2]-1].z);
+            
+            glEnd();
+        }
+    }
+    
+    glEndList();
+    
+    // End drawing Code
+    return listNumber;
 }

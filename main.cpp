@@ -32,16 +32,14 @@ GLUquadricObj *sphere3 = NULL;
 #define OBJ_INDEX 1
 #define MIN_ARGS 2
 
-#define MARKO
+#define FREDDY
 
 
-// Because GLUT doesn't like objects
-static vec3* vertices_ptr;
-static int vertice_count;
+// The drawlist the object loader creates
+static GLuint drawList = 0;
+float angle = 0.0;
 
-static vec3* normal_ptr;
-static int normal_count;
-
+// The phong program
 GLuint phong_program;
 
 // Muted material properties
@@ -161,7 +159,9 @@ extern "C" {
     
     
     void drawFred(){
-        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glCallList(drawList);
+        glutSwapBuffers();
     }
     
     void display( void ) {
@@ -192,10 +192,18 @@ extern "C" {
 		switch( key ) {
 		case 'q': case 'Q': case 033:
 			exit( EXIT_SUCCESS );
-
 		}
-
 	}
+    
+    void callback(int time){
+        if (angle >= 360.0)
+            angle-= 360.0;
+        
+        angle+= 0.015;
+        glRotatef(angle, 1.0, 0.0, 0.0);
+        drawFred();
+        glutTimerFunc(100, callback, 100);
+    }
 
 #ifdef __cplusplus
 }
@@ -248,7 +256,7 @@ GLfloat pos[] = { 10.0, 10.0, 0.0, 0.0 };
 GLfloat amb[] = { 0.4, 0.4, 0.4, 1.0 };
 
 void init( void ) {
-	glEnable(GL_TEXTURE_2D); // Enable texturing so we can bind our frame buffer texture
+	//glEnable(GL_TEXTURE_2D); // Enable texturing so we can bind our frame buffer texture
 
 	// enable depth testing
 	glEnable( GL_DEPTH_TEST );
@@ -262,7 +270,7 @@ void init( void ) {
 	gluPerspective( 45, 1.0, 1.0, 100.0 );
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
-	gluLookAt( 0.0, 0.0, 30.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 );
+	gluLookAt( 0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 );
 
 	// switch on the light
 	glEnable( GL_LIGHTING );
@@ -294,22 +302,27 @@ int main( int argc,  const char *argv[] ) {
 	try{
 		// Setup glut
 		glutInit(&argc,(char**)argv);
-		glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+		glutInitDisplayMode(GLUT_RGBA | GL_DOUBLE | GLUT_DEPTH );
 		glutInitWindowSize(WINDOW_W, WINDOW_H);
 		glutInitWindowPosition(WINDOW_X, WINDOW_Y);
 		glutCreateWindow(WINDOW_TITLE);
-        
-        // Read file
-        OBJLoader obj;
-        obj.loadOBJ(fname);
-        
+   
 
 		// Initialize glew
 		glewInit();
 		init();
+        
+        
+        // Read file
+        OBJLoader obj;
+        obj.loadOBJ(fname);
+        drawList = obj.generateDrawList();
+        
+        // GLCallbacks
 		glutDisplayFunc(display);
 		glutKeyboardFunc(keyboard);
         glutReshapeFunc(reshape);
+        glutTimerFunc(100, callback, 100);
 		glutMainLoop();
 		return(0);
 	} catch( std::runtime_error& err ) {

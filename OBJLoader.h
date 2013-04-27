@@ -8,6 +8,15 @@
 #include <fstream>
 #include <vector>
 
+#ifdef __APPLE__
+#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl.h>
+#include <Opengl/glu.h>
+#include <OpenGL/glext.h>
+#else
+#include <GL/gl.h>
+#endif
+
 #include "Vector.hpp"
 #include "Matrix.hpp"
 #include "Face.h"
@@ -55,19 +64,12 @@ public: // Load .OBJ file
 	 *@throw std::runtime_exception
 	 */
 	void loadOBJ( const std::string& fname );
-
-public: // Public interface
-
-	/** Get reference to the .OBJ vector which contains all of the verticies.
-	 *@param none
-	 *@return Reference to the vector holding the verticies
-	 */
-    const vec3* vertices_ptr() const;
-    const vec3* normals_ptr() const;
     
-    /**
+    /** Based on the information loaded
+     *  Generate a draw list.
+     *@return The id of the drawlist.
      */
-    int vertice_count() const;
+    GLuint generateDrawList();
 
 
 private: // class members
