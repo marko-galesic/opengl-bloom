@@ -161,7 +161,7 @@ extern "C" {
     void drawFred(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glCallList(drawList);
-        glutSwapBuffers();
+        glFlush();
     }
     
     void display( void ) {
@@ -302,7 +302,7 @@ int main( int argc,  const char *argv[] ) {
 	try{
 		// Setup glut
 		glutInit(&argc,(char**)argv);
-		glutInitDisplayMode(GLUT_RGBA | GL_DOUBLE | GLUT_DEPTH );
+		glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH );
 		glutInitWindowSize(WINDOW_W, WINDOW_H);
 		glutInitWindowPosition(WINDOW_X, WINDOW_Y);
 		glutCreateWindow(WINDOW_TITLE);
