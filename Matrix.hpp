@@ -18,6 +18,11 @@ struct Matrix2 {
     vec2 y;
 };
 
+
+
+
+
+
 template <typename T>
 struct Matrix3 {
     Matrix3()
@@ -51,6 +56,13 @@ struct Matrix3 {
     vec3 y;
     vec3 z;
 };
+
+
+
+
+
+
+
 
 template <typename T>
 struct Matrix4 {
@@ -239,6 +251,9 @@ struct Matrix4 {
     vec4 z;
     vec4 w;
 };
+
+
+
 
 typedef Matrix2<float> mat2;
 typedef Matrix3<float> mat3;

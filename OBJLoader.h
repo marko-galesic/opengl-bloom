@@ -10,7 +10,26 @@
 
 #include "Vector.hpp"
 #include "Matrix.hpp"
+#include "Face.h"
 
+#define MATCH 0
+#define BUFFER 128
+#define QUAD 4
+#define VECTOR "v"
+#define NORMAL "vn"
+#define UV_VEC "vt"
+#define FACE "f"
+
+#define FACE_QUAD_NOMTL ( 2 * 4 )
+#define FACE_TRIANGLE_NOMTL ( 2 * 3 )
+
+#define VEC_STR "%f %f %f\n"
+#define NOR_STR "%f %f %f\n"
+#define UVV_STR "%f %f\n"
+#define FACE_STR "%d//%d %d//%d %d//%d %d//%d\n"
+
+#define FILLVEC(n) &n.x, &n.y, &n.z
+#define FILLVEC2(n) &n.x, &n.y
 /**
  * Load .OBJ files & provide access to its informaiton.
  * @version 1.0
@@ -43,7 +62,8 @@ public: // Public interface
 	 *@param none
 	 *@return Reference to the vector holding the verticies
 	 */
-	const vec3* vertices_ptr() const;
+    const vec3* vertices_ptr() const;
+    const vec3* normals_ptr() const;
     
     /**
      */
@@ -55,5 +75,17 @@ private: // class members
 	/**	Stores verticies read in from .OBJ file 
 	*/
 	std::vector< vec3 > vertices;
+    
+    /** Stores normals
+     */
+    std::vector< vec3 > normals;
+    
+    /** UVCoordinates
+     */
+    std::vector< vec2 > uvcoords;
+    
+    /** Faces to draw
+     */
+    std::vector< Face > faces;
 };
 #endif // !OBJLoader_H

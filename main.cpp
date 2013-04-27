@@ -38,6 +38,10 @@ GLUquadricObj *sphere3 = NULL;
 // Because GLUT doesn't like objects
 static vec3* vertices_ptr;
 static int vertice_count;
+
+static vec3* normal_ptr;
+static int normal_count;
+
 GLuint phong_program;
 
 // Muted material properties
@@ -284,6 +288,8 @@ int main( int argc,  const char *argv[] ) {
 
 	// Extract file name
 	std::string fname(argv[OBJ_INDEX]);
+    
+    std::cout << fname.c_str() << std::endl;
 
 	try{
 		// Setup glut
@@ -292,6 +298,11 @@ int main( int argc,  const char *argv[] ) {
 		glutInitWindowSize(WINDOW_W, WINDOW_H);
 		glutInitWindowPosition(WINDOW_X, WINDOW_Y);
 		glutCreateWindow(WINDOW_TITLE);
+        
+        // Read file
+        OBJLoader obj;
+        obj.loadOBJ(fname);
+        
 
 		// Initialize glew
 		glewInit();
