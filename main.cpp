@@ -90,7 +90,9 @@ extern "C" {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 		glLoadIdentity();									
 		glTranslatef(0.0f, 0.0f, -2.0f);
-		glBindTexture(GL_TEXTURE_2D, fbo_texture);
+		
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, fbo_texture);
         
 		glBegin(GL_QUADS);
             glTexCoord2f(0.0f, 0.0f);glVertex3f(-1.0f, -1.0f, 0.0f);						        
