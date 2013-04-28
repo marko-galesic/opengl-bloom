@@ -88,6 +88,9 @@ extern "C" {
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);		        
         
         
+        /** Anything rendered here is performend on the framebuffer glut
+         *  created for us. Here, we use the FBO-TEXTURE2d object as a texture
+         */
 		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);				
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 		glLoadIdentity();									
@@ -187,12 +190,10 @@ void initFrameBufferTexture(void) {
 	glGenTextures(1, &fbo_texture);
 	glBindTexture(GL_TEXTURE_2D, fbo_texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WINDOW_W, WINDOW_H, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
