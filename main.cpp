@@ -59,101 +59,101 @@ extern "C" {
 #endif
 
     
-    // Drawing method used by GLUTS callback
-    //--------------------------------------------------------------------------
-    void display(){
-        
-        /* Render the 3D scene to our FBO.
-           Note - That anything we render to the FBO is also present on the
-           2d FBOTEXTURE object. This is becuase we attached the TEXTURE
-           buffer object to the FBO object.
-         */
-       	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-            glPushAttrib(GL_VIEWPORT_BIT | GL_ENABLE_BIT);
-            glViewport(0, 0, WINDOW_W, WINDOW_H);
-            glMatrixMode( GL_PROJECTION );
-            glLoadIdentity();
-            gluPerspective( 45, 1.0, 1.0, 100.0 );
-            glMatrixMode( GL_MODELVIEW );
-            glLoadIdentity();
-            gluLookAt( 0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 );
-            glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
-            glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-            glPushMatrix();
-                glRotatef(angle, 1.0f, 0.0f, 0.0f);
-                glCallList(drawList);
-            glPopMatrix();
-            glPopAttrib();
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);		        
-        
-        
-        /** Anything rendered here is performend on the framebuffer glut
-         *  created for us. Here, we use the FBO-TEXTURE2d object as a texture
-         */
-		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);				
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
-		glLoadIdentity();									
-		glTranslatef(0.0f, 0.0f, -2.0f);
-		
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, fbo_texture);
-        
-        glUseProgram(bloom_shader);
-        GLuint texIndex = glGetUniformLocation(bloom_shader, "fboTexture");
-        glUniform1i(texIndex, 0);
-        
-		glBegin(GL_QUADS);
-            glTexCoord2f(0.0f, 0.0f);glVertex3f(-1.0f, -1.0f, 0.0f);						        
-            glTexCoord2f(0.0f, 1.0f);glVertex3f(-1.0f, 1.0f, 0.0f);						
-            glTexCoord2f(1.0f, 1.0f);glVertex3f(1.0f, 1.0f, 0.0f);						
-            glTexCoord2f(1.0f, 0.0f);glVertex3f(1.0f, -1.0f, 0.0f);						
-		glEnd();
-		glBindTexture(GL_TEXTURE_2D, 0);					        
-		glFlush();
-        glUseProgram(0);
- 
+// Drawing method used by GLUTS callback
+//------------------------------------------------------------------------------
+void display(){
+    
+    /* Render the 3D scene to our FBO.
+       Note - That anything we render to the FBO is also present on the
+       2d FBOTEXTURE object. This is becuase we attached the TEXTURE
+       buffer object to the FBO object.
+     */
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+        glPushAttrib(GL_VIEWPORT_BIT | GL_ENABLE_BIT);
+        glViewport(0, 0, WINDOW_W, WINDOW_H);
+        glMatrixMode( GL_PROJECTION );
+        glLoadIdentity();
+        gluPerspective( 45, 1.0, 1.0, 100.0 );
+        glMatrixMode( GL_MODELVIEW );
+        glLoadIdentity();
+        gluLookAt( 0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 );
+        glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+        glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+        glPushMatrix();
+            glRotatef(angle, 1.0f, 0.0f, 0.0f);
+            glCallList(drawList);
+        glPopMatrix();
+        glPopAttrib();
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);		        
+    
+    
+    /** Anything rendered here is performend on the framebuffer glut
+     *  created for us. Here, we use the FBO-TEXTURE2d object as a texture
+     */
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);				
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+    glLoadIdentity();									
+    glTranslatef(0.0f, 0.0f, -2.0f);
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, fbo_texture);
+    
+    glUseProgram(bloom_shader);
+    GLuint texIndex = glGetUniformLocation(bloom_shader, "fboTexture");
+    glUniform1i(texIndex, 0);
+    
+    glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);glVertex3f(-1.0f, -1.0f, 0.0f);						        
+        glTexCoord2f(0.0f, 1.0f);glVertex3f(-1.0f, 1.0f, 0.0f);						
+        glTexCoord2f(1.0f, 1.0f);glVertex3f(1.0f, 1.0f, 0.0f);						
+        glTexCoord2f(1.0f, 0.0f);glVertex3f(1.0f, -1.0f, 0.0f);						
+    glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);					        
+    glFlush();
+    glUseProgram(0);
+
+}
+
+
+
+
+
+
+// Reshape viewport - GLUT callback
+//------------------------------------------------------------------------------
+void reshape( int width, int height ) {
+    glViewport( 0, 0, width, height );
+
+}
+
+
+
+
+
+
+// Handle Keyboard input - GLUT callback
+//------------------------------------------------------------------------------
+void keyboard( unsigned char key, int x, int y ) {
+    switch( key ) {
+    case 'q': case 'Q': case 033:
+        exit( EXIT_SUCCESS );
     }
-    
+}
 
-    
-    
-    
-    
-    // Reshape viewport - GLUT callback
-    //--------------------------------------------------------------------------
-	void reshape( int width, int height ) {
-        glViewport( 0, 0, width, height );
 
-	}
 
+
+// Rotate Screen - GLUT Callback
+//------------------------------------------------------------------------------
+void callback(int time){
+    if (angle >= 360.0)
+        angle-= 360.0;
     
-    
-    
-    
-    
-    // Handle Keyboard input - GLUT callback
-    //--------------------------------------------------------------------------
-	void keyboard( unsigned char key, int x, int y ) {
-		switch( key ) {
-		case 'q': case 'Q': case 033:
-			exit( EXIT_SUCCESS );
-		}
-	}
-    
-    
-    
-    
-    // Rotate Screen - GLUT Callback
-    //--------------------------------------------------------------------------
-    void callback(int time){
-        if (angle >= 360.0)
-            angle-= 360.0;
-        
-        angle+= 1.0;
-        display();
-        glutTimerFunc(100, callback, 100);
-    }
+    angle+= 1.0;
+    display();
+    glutTimerFunc(100, callback, 100);
+}
 
 #ifdef __cplusplus
 }
@@ -164,10 +164,7 @@ extern "C" {
 
 
 
-
-
-
-//
+// Initialize the depth buffer - Will be attached to the FBO object
 //------------------------------------------------------------------------------
 void initFrameBufferDepthBuffer(void) {
 	glGenRenderbuffersEXT(1, &fbo_depth); 
@@ -184,7 +181,7 @@ void initFrameBufferDepthBuffer(void) {
 
 
 
-//
+// Initalize the Texture - will be attached to the FBO object
 //------------------------------------------------------------------------------
 void initFrameBufferTexture(void) {
 	glGenTextures(1, &fbo_texture);
@@ -203,7 +200,7 @@ void initFrameBufferTexture(void) {
 
 
 
-//
+// Intialize FBO - Attach the depth & texture
 //------------------------------------------------------------------------------
 void initFrameBuffer(void) {
 	initFrameBufferDepthBuffer(); 
@@ -227,7 +224,7 @@ void initFrameBuffer(void) {
 
 
 
-//
+// Initalize the OpenGL state
 //------------------------------------------------------------------------------
 void init( void ) {
     // Enable for post processing
