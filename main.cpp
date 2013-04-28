@@ -307,11 +307,9 @@ int main( int argc,  const char *argv[] ) {
 		glutInitWindowPosition(WINDOW_X, WINDOW_Y);
 		glutCreateWindow(WINDOW_TITLE);
    
-
 		// Initialize glew
 		glewInit();
 		init();
-        
         
         // Read file
         OBJLoader obj;
