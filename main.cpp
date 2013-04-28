@@ -6,18 +6,19 @@
  * Some code taken from lab0 and Swiftless tutorials
  */
 #ifdef __APPLE__
-#include <GL/glew.h>	// Include the GLEW header file
+#include <GL/glew.h>	
 #include <GLUT/GLUT.h>
 #else
 #include <GL/glew.h>
 #include <GL/glut.h>
 #endif
-#include <iostream>		// Allow us to print to the console
+#include <iostream>	
 #include "OBJLoader.h"
+#include "ShaderSetup.h"
 
-unsigned int fbo;			// The frame buffer object
-unsigned int fbo_depth;		// The depth buffer for the frame buffer object
-unsigned int fbo_texture;	// The texture object to write our frame buffer object to
+GLuint fbo;			// The frame buffer object
+GLuint fbo_depth;		// The depth buffer for the frame buffer object
+GLuint fbo_texture;	// The texture object to write our frame buffer object to
 
 #define WINDOW_H 600
 #define WINDOW_W 800
@@ -28,15 +29,16 @@ unsigned int fbo_texture;	// The texture object to write our frame buffer object
 #define OBJ_INDEX 1
 #define MIN_ARGS 2
 
-#define MARKO
+#define BLOOM_FRAG "bloom.frag"
+#define BLOOM_VERT "bloom.vert"
 
 
 // The drawlist the object loader creates
 static GLuint drawList = 0;
 float angle = 0.0;
 
-// The phong program
-GLuint phong_program;
+// The bloom shader
+GLuint bloom_shader;
 
 // Muted material properties
 GLfloat ad_red[]   = { 0.6, 0.0, 0.0, 1.0 };
@@ -94,6 +96,10 @@ extern "C" {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, fbo_texture);
         
+        glUseProgram(bloom_shader);
+        GLuint texIndex = glGetUniformLocation(bloom_shader, "fboTexture");
+        glUniform1i(texIndex, 0);
+        
 		glBegin(GL_QUADS);
             glTexCoord2f(0.0f, 0.0f);glVertex3f(-1.0f, -1.0f, 0.0f);						        
             glTexCoord2f(0.0f, 1.0f);glVertex3f(-1.0f, 1.0f, 0.0f);						
@@ -102,6 +108,7 @@ extern "C" {
 		glEnd();
 		glBindTexture(GL_TEXTURE_2D, 0);					        
 		glFlush();
+        glUseProgram(0);
  
     }
     
@@ -245,6 +252,15 @@ void init( void ) {
 	glLightfv( GL_LIGHT0, GL_POSITION, pos );
 	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, amb );
 	glEnable( GL_LIGHT0 );
+    
+    // Load shader
+    GLuint bloom_shader_error = 0;
+    
+    bloom_shader = ShaderSetup(BLOOM_VERT, BLOOM_FRAG, &bloom_shader_error);
+    if (bloom_shader_error != E_NO_ERROR) {
+        fprintf(stderr, "Error in shader - %s\n", ErrorString(bloom_shader_error));
+        exit(1);
+    }
 
 }
 
