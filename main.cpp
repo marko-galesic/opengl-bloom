@@ -121,6 +121,8 @@ void display(){
     
     
     
+    
+    
     /** Post Processing: Pass# 1
      *  This pass provides the gaussion blur (Horizontal)
      */
@@ -152,6 +154,8 @@ void display(){
     glUseProgram(0);
     glPopAttrib();
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
+    
+    
     
     
     
@@ -192,6 +196,8 @@ void display(){
     
     
     
+    
+    
     /** Pass initially rendered image for blur.
      *  BLEND
      */
@@ -218,6 +224,13 @@ void display(){
     glUseProgram(0);
     glPopAttrib();
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
+    
+    
+    
+    
+    
+    
+    
     
     
     
