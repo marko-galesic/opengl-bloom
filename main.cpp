@@ -69,8 +69,8 @@ GLuint blend_shader;
 int fb_in_use = 0;
 
 // Control blur
-GLfloat vert_blur = 1.0 / 512.0;
-GLfloat horz_blur = 1.0 / 512.0;
+GLfloat vert_blur = 1.0 / 256.0;
+GLfloat horz_blur = 1.0 / 256.0;
 
 // Muted material properties
 GLfloat ad_red[]   = { 0.6, 0.0, 0.0, 1.0 };
@@ -228,13 +228,13 @@ void display(){
     GLuint pass_3O  = glGetUniformLocation(blend_shader, "org");
     GLuint pass_3B = glGetUniformLocation(blend_shader, "blur");
     
-    // Bind first texture
+    // Bind first texture (The blurred image)
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, third_texture);
+    glBindTexture(GL_TEXTURE_2D, init_texture);
     glUniform1i(pass_3O, 0);
     
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, init_texture);
+    glBindTexture(GL_TEXTURE_2D, third_texture);
     glUniform1f(pass_3B, 1);
     
     glBegin(GL_QUADS);
