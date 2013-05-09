@@ -68,6 +68,10 @@ GLuint blend_shader;
 // Which fbo is in use
 int fb_in_use = 0;
 
+// Control blur
+GLfloat vert_blur = 1.0 / 512.0;
+GLfloat horz_blur = 1.0 / 512.0;
+
 // Muted material properties
 GLfloat ad_red[]   = { 0.6, 0.0, 0.0, 1.0 };
 GLfloat ad_green[] = { 0.0, 0.6, 0.2, 1.0 };
@@ -139,9 +143,14 @@ void display(){
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, init_texture);
     
-    glUseProgram(bloom_shader);
-    GLuint pass_1 = glGetUniformLocation(bloom_shader, "fboTexture");
+    // Activate shaders
+    glUseProgram(vert_blur_shader);
+    
+    // Get uniforms
+    GLuint pass_1  = glGetUniformLocation(vert_blur_shader, "tex");
+    GLuint blur_sv = glGetUniformLocation(vert_blur_shader, "gaus_vert_r");
     glUniform1i(pass_1, 0);
+    glUniform1f(blur_sv, vert_blur);
     
     glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f);glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
@@ -175,9 +184,14 @@ void display(){
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, second_texture);
     
-    glUseProgram(bloom_shader);
-    GLuint pass_2 = glGetUniformLocation(bloom_shader, "fboTexture");
+    // Activate shaders
+    glUseProgram(horz_blur_shader);
+    
+    // Get uniforms
+    GLuint pass_2  = glGetUniformLocation(horz_blur_shader, "tex");
+    GLuint blur_sh = glGetUniformLocation(horz_blur_shader, "gaus_horz_r");
     glUniform1i(pass_2, 0);
+    glUniform1f(blur_sh, vert_blur);
     
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 0.0f);glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
@@ -206,12 +220,22 @@ void display(){
     glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+
+    // Activate shaders
+    glUseProgram(blend_shader);
+    
+    // Get uniforms
+    GLuint pass_3O  = glGetUniformLocation(blend_shader, "org");
+    GLuint pass_3B = glGetUniformLocation(blend_shader, "blur");
+    
+    // Bind first texture
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, third_texture);
+    glUniform1i(pass_3O, 0);
     
-    glUseProgram(bloom_shader);
-    GLuint pass_3 = glGetUniformLocation(bloom_shader, "fboTexture");
-    glUniform1i(pass_3, 0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, init_texture);
+    glUniform1f(pass_3B, 1);
     
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 0.0f);glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
@@ -457,10 +481,38 @@ void init( void ) {
     
     // Load shader
     GLuint bloom_shader_error = 0;
+    GLuint vert_blur_shader_error = 0;
+    GLuint horz_blur_shader_error = 0;
+    GLuint blend_shader_error = 0;
     
+    
+    // Load bloom shader
     bloom_shader = ShaderSetup(BLOOM_VERT, BLOOM_FRAG, &bloom_shader_error);
     if (bloom_shader_error != E_NO_ERROR) {
         fprintf(stderr, "Error in shader - %s\n", ErrorString(bloom_shader_error));
+        exit(1);
+    }
+    
+    
+    // Load gaussian blur (vertical)
+    vert_blur_shader = ShaderSetup(VERT_BLUR_VS, VERT_BLUR_FS, &vert_blur_shader_error);
+    if (vert_blur_shader_error != E_NO_ERROR) {
+        fprintf(stderr, "Error in shader - %s\n", ErrorString(vert_blur_shader_error));
+        exit(1);
+    }
+    
+    // Load gaussian blur (horizontal)
+    horz_blur_shader = ShaderSetup(HORZ_BLUR_VS, HORZ_BLUR_FS, &horz_blur_shader_error);
+    if (horz_blur_shader_error != E_NO_ERROR) {
+        fprintf(stderr, "Error in shader - %s\n", ErrorString(horz_blur_shader_error));
+        exit(1);
+    }
+    
+    
+    // Load gaussian blur (horizontal)
+    blend_shader = ShaderSetup(BLEND_VS, BLEND_FS, &blend_shader_error);
+    if (blend_shader_error != E_NO_ERROR) {
+        fprintf(stderr, "Error in shader - %s\n", ErrorString(blend_shader_error));
         exit(1);
     }
 
@@ -507,7 +559,7 @@ int main( int argc,  const char *argv[] ) {
 		glutDisplayFunc(display);
 		glutKeyboardFunc(keyboard);
         glutReshapeFunc(reshape);
-        glutTimerFunc(100, callback, 100);
+        //glutTimerFunc(100, callback, 100);
 		glutMainLoop();
 		return(0);
 	} catch( std::runtime_error& err ) {
