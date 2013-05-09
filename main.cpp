@@ -33,6 +33,7 @@ GLuint third_texture;   // The second texture object
 #define WINDOW_W 800
 #define WINDOW_X 0
 #define WINDOW_Y 0
+#define BLUR_STEP 10.0
 #define WINDOW_TITLE "Bloom - Shading Project"
 
 #define OBJ_INDEX 1
@@ -69,8 +70,10 @@ GLuint blend_shader;
 int fb_in_use = 0;
 
 // Control blur
-GLfloat vert_blur = 1.0 / 512.0;
-GLfloat horz_blur = 1.0 / 512.0;
+GLfloat vert_blur_den = 512.0;
+GLfloat horz_blur_den = 512.0;
+GLfloat vert_blur = 1.0 / vert_blur_den;
+GLfloat horz_blur = 1.0 / horz_blur_den;
 
 // Muted material properties
 GLfloat ad_red[]   = { 0.6, 0.0, 0.0, 1.0 };
@@ -100,7 +103,6 @@ void display(){
      */
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
         glPushAttrib(GL_VIEWPORT_BIT | GL_ENABLE_BIT);
-        //glViewport(0, 0, w_width, w_height);
         glMatrixMode( GL_PROJECTION );
         glLoadIdentity();
         gluPerspective( 45, 1.0, 1.0, 100.0 );
@@ -327,9 +329,24 @@ void reshape( int width, int height ) {
 //------------------------------------------------------------------------------
 void keyboard( unsigned char key, int x, int y ) {
     switch( key ) {
-    case 'q': case 'Q': case 033:
-        exit( EXIT_SUCCESS );
+    case 'q':
+    case 'Q':
+    case 033:exit( EXIT_SUCCESS );
+        break;
+    case 'w':
+    case 'W':vert_blur_den+=BLUR_STEP;
+        break;
+    case 's':
+    case 'S':vert_blur_den-= BLUR_STEP;
+        break;
+    case 'd':
+    case 'D':horz_blur_den+= BLUR_STEP;
+        break;
+    case 'a':
+    case 'A': horz_blur_den-= BLUR_STEP;
+        break;
     }
+    display();
 }
 
 
@@ -579,7 +596,7 @@ int main( int argc,  const char *argv[] ) {
 		glutDisplayFunc(display);
 		glutKeyboardFunc(keyboard);
         glutReshapeFunc(reshape);
-        //glutTimerFunc(100, callback, 100);
+        glutTimerFunc(100, callback, 100);
 		glutMainLoop();
 		return(0);
 	} catch( std::runtime_error& err ) {
