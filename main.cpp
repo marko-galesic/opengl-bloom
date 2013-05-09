@@ -69,8 +69,8 @@ GLuint blend_shader;
 int fb_in_use = 0;
 
 // Control blur
-GLfloat vert_blur = 1.0 / 256.0;
-GLfloat horz_blur = 1.0 / 256.0;
+GLfloat vert_blur = 1.0 / 512.0;
+GLfloat horz_blur = 1.0 / 512.0;
 
 // Muted material properties
 GLfloat ad_red[]   = { 0.6, 0.0, 0.0, 1.0 };
@@ -220,32 +220,52 @@ void display(){
     glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-
-    // Activate shaders
-    glUseProgram(blend_shader);
     
     // Get uniforms
     GLuint pass_3O  = glGetUniformLocation(blend_shader, "org");
     GLuint pass_3B = glGetUniformLocation(blend_shader, "blur");
     
-    // Bind first texture (The blurred image)
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, init_texture);
+    // Activate shaders
+    glUseProgram(blend_shader);
+    
+    // Assign index to 2d images
     glUniform1i(pass_3O, 0);
+    glUniform1f(pass_3B, 2);
     
-    glActiveTexture(GL_TEXTURE1);
+    // Bind first texture (The blurred image)
+    glActiveTexture(GL_TEXTURE0 );
     glBindTexture(GL_TEXTURE_2D, third_texture);
-    glUniform1f(pass_3B, 1);
     
+    // Bind the second texture (The inital rostorized image)
+    glActiveTexture(GL_TEXTURE1 );
+    glBindTexture(GL_TEXTURE_2D, init_texture);
+    
+
+    
+    // Draw to quad
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
-    glTexCoord2f(0.0f, 1.0f);glVertex3f(-w_width/2.0,   w_height/2.0, 0.5f);
-    glTexCoord2f(1.0f, 1.0f);glVertex3f(w_width/2.0,    w_height/2.0, 0.5f);
-    glTexCoord2f(1.0f, 0.0f);glVertex3f(w_width/2.0,   -w_height/2.0, 0.5f);
+        glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 0.0f);
+        glMultiTexCoord2f(GL_TEXTURE1, 0.0f, 0.0f);
+        glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
+        
+        glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 1.0f);
+        glMultiTexCoord2f(GL_TEXTURE1, 0.0f, 1.0f);
+        glVertex3f(-w_width/2.0,   w_height/2.0, 0.5f);
+        
+        glMultiTexCoord2f(GL_TEXTURE0, 1.0f, 1.0f);
+        glMultiTexCoord2f(GL_TEXTURE1, 1.0f, 1.0f);
+        glVertex3f(w_width/2.0,    w_height/2.0, 0.5f);
+        
+        glMultiTexCoord2f(GL_TEXTURE0, 1.0f, 0.0f);
+        glMultiTexCoord2f(GL_TEXTURE1, 1.0f, 0.0f);
+        glVertex3f(w_width/2.0,   -w_height/2.0, 0.5f);
     glEnd();
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, 0);
+     glUseProgram(0);
     glFlush();
-    glUseProgram(0);
     glPopAttrib();
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
     
