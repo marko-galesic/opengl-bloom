@@ -41,6 +41,15 @@ GLuint third_texture;   // The second texture object
 #define BLOOM_FRAG "bloom.frag"
 #define BLOOM_VERT "bloom.vert"
 
+#define VERT_BLUR_FS "gaus_vert.fs"
+#define VERT_BLUR_VS "gaus_vert.vs"
+
+#define HORZ_BLUR_FS "gaus_horz.fs"
+#define HORZ_BLUR_VS "gaus_horz.vs"
+
+#define BLEND_FS "blend.fs"
+#define BLEND_VS "blend.vs"
+
 
 // The drawlist the object loader creates
 static GLuint drawList = 0;
@@ -52,6 +61,9 @@ GLfloat w_height= WINDOW_H;
 
 // The bloom shader
 GLuint bloom_shader;
+GLuint vert_blur_shader;
+GLuint horz_blur_shader;
+GLuint blend_shader;
 
 // Which fbo is in use
 int fb_in_use = 0;
