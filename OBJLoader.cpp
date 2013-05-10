@@ -1,4 +1,5 @@
 #include "OBJLoader.h"
+#include <stdexcept>
 
 // Construction
 //-----------------------------------------------------------------------------
