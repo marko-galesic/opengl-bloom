@@ -9,17 +9,17 @@ OBJ= OBJLoader.o ShaderSetup.o Face.o
 
 
 main: $(OBJ)
-	$(CXX) $(CXXFLAG) -o Bloom main.cpp OBJLoader.o ShaderSetup.o Face.o Matrix.hpp Vector.hpp $(CXXLIB) $(CXXINC) $(CXXFWK)
+	$(CXX) $(CXXFLAG) -o Bloom main.cpp OBJLoader.o ShaderSetup.o Face.o $(CXXLIB) $(CXXINC) $(CXXFWK)
 
 
 OBJLoader.o: OBJLoader.h
-	$(CXX) $(CXXFLAG) -c OBJLoader.cpp $(CXXLIB) $(CXXINC) $(CXXFWK) 
+	$(CXX) $(CXXFLAG) -c OBJLoader.cpp  
 
 ShaderSetup.o: ShaderSetup.h ShaderSetup.cpp
-	$(CXX) $(CXXFLAG) -c ShaderSetup.cpp $(CXXLIB) $(CXXINC) $(CXXFWK)
+	$(CXX) $(CXXFLAG) -c ShaderSetup.cpp 
 
 Face.o: Face.h Face.cpp
-	$(CXX) $(CXXFLAG) -c Face.cpp $(CXXLIB) $(CXXINC) $(CXXFWK)
+	$(CXX) $(CXXFLAG) -c Face.cpp 
 clean:
 	rm -Rf $(OBJ)
 	rm -Rf Bloom
