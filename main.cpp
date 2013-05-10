@@ -13,6 +13,7 @@
 #include <GL/glut.h>
 #endif
 #include <iostream>	
+#include <stdexcept>
 #include "OBJLoader.h"
 #include "ShaderSetup.h"
 
@@ -243,6 +244,9 @@ void display(){
     glBindTexture(GL_TEXTURE_2D, init_texture);
     
 
+    
+    
+    
     
     // Draw to quad
     glBegin(GL_QUADS);
