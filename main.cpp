@@ -30,6 +30,10 @@ GLuint fbo3;            // The second frame buffer object
 GLuint fbo3_depth;      // The second depth buffer object
 GLuint third_texture;   // The second texture object
 
+GLuint fbo4;            // The second frame buffer object
+GLuint fbo4_depth;      // The second depth buffer object
+GLuint fourth_texture;   // The second texture object
+
 #define WINDOW_H 600
 #define WINDOW_W 800
 #define WINDOW_X 0
@@ -218,7 +222,7 @@ void display(){
     /** Pass initially rendered image for blur.
      *  BLEND
      */
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo2);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo4);
     glPushAttrib(GL_VIEWPORT_BIT | GL_ENABLE_BIT);
     glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -231,19 +235,18 @@ void display(){
     // Activate shaders
     glUseProgram(blend_shader);
     
-    // Assign index to 2d images
-    glUniform1i(pass_3O, 0);
-    glUniform1f(pass_3B, 2);
     
     // Bind first texture (The blurred image)
     glActiveTexture(GL_TEXTURE0 );
-    glBindTexture(GL_TEXTURE_2D, third_texture);
+    glBindTexture(GL_TEXTURE_2D, init_texture);
     
     // Bind the second texture (The inital rostorized image)
     glActiveTexture(GL_TEXTURE1 );
-    glBindTexture(GL_TEXTURE_2D, init_texture);
+    glBindTexture(GL_TEXTURE_2D, third_texture);
     
-
+    // Assign index to 2d images
+    glUniform1i(pass_3O, 0);
+    glUniform1i(pass_3B, 1);
     
     
     
@@ -266,13 +269,17 @@ void display(){
         glMultiTexCoord2f(GL_TEXTURE1, 1.0f, 0.0f);
         glVertex3f(w_width/2.0,   -w_height/2.0, 0.5f);
     glEnd();
+    glFlush();
+    glPopAttrib();
+    
+    // Unbind textures
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, 0);
-     glUseProgram(0);
-    glFlush();
-    glPopAttrib();
+    
+    // Disable blend shader
+    glUseProgram(0);
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
     
     
@@ -291,7 +298,7 @@ void display(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, second_texture);
+    glBindTexture(GL_TEXTURE_2D, fourth_texture);
     
     glUseProgram(bloom_shader);
     GLuint pass_final = glGetUniformLocation(bloom_shader, "fboTexture");
@@ -398,6 +405,12 @@ void initFrameBufferDepthBuffer(void) {
 	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, w_width, w_height);
     glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo3_depth);
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+    
+    glGenRenderbuffersEXT(1, &fbo4_depth);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo4_depth);
+	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, w_width, w_height);
+    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo4_depth);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 }
 
 
@@ -430,6 +443,15 @@ void initFrameBufferTexture(void) {
     
     glGenTextures(1, &third_texture);
 	glBindTexture(GL_TEXTURE_2D, third_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w_width, w_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+    
+    glGenTextures(1, &fourth_texture);
+	glBindTexture(GL_TEXTURE_2D, fourth_texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w_width, w_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -482,6 +504,18 @@ void initFrameBuffer(void) {
 	if (fbo3_status != GL_FRAMEBUFFER_COMPLETE_EXT)
 	{
 		std::cout << "Couldn't create third frame buffer" << std::endl;
+		exit(0);
+	}
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    
+    glGenFramebuffersEXT(1, &fbo4);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo4);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, fourth_texture, 0);
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo4_depth);
+	GLenum fbo4_status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	if (fbo4_status != GL_FRAMEBUFFER_COMPLETE_EXT)
+	{
+		std::cout << "Couldn't create fourth frame buffer" << std::endl;
 		exit(0);
 	}
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
