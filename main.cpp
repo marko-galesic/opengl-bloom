@@ -75,8 +75,8 @@ GLuint blend_shader;
 int fb_in_use = 0;
 
 // Control blur
-GLfloat vert_blur_den = 512.0;
-GLfloat horz_blur_den = 512.0;
+GLfloat vert_blur_den = 64.0;
+GLfloat horz_blur_den = 64.0;
 GLfloat vert_blur = 1.0 / vert_blur_den;
 GLfloat horz_blur = 1.0 / horz_blur_den;
 
@@ -116,14 +116,15 @@ void display(){
         gluLookAt( 0.0, 5.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 );
         glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
         glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
         glPushMatrix();
             glRotatef(angle, 1.0f, 0.0f, 0.0f);
             glCallList(drawList);
             glFlush();
         glPopMatrix();
+    
         glPopAttrib();
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    
     
     
     
@@ -198,7 +199,7 @@ void display(){
     GLuint pass_2  = glGetUniformLocation(horz_blur_shader, "tex");
     GLuint blur_sh = glGetUniformLocation(horz_blur_shader, "gaus_horz_r");
     glUniform1i(pass_2, 0);
-    glUniform1f(blur_sh, vert_blur);
+    glUniform1f(blur_sh, horz_blur);
     
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 0.0f);glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
@@ -305,10 +306,10 @@ void display(){
     glUniform1i(pass_final, 0);
     
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
-    glTexCoord2f(0.0f, 1.0f);glVertex3f(-w_width/2.0,   w_height/2.0, 0.5f);
-    glTexCoord2f(1.0f, 1.0f);glVertex3f(w_width/2.0,    w_height/2.0, 0.5f);
-    glTexCoord2f(1.0f, 0.0f);glVertex3f(w_width/2.0,   -w_height/2.0, 0.5f);
+        glTexCoord2f(0.0f, 0.0f);glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
+        glTexCoord2f(0.0f, 1.0f);glVertex3f(-w_width/2.0,   w_height/2.0, 0.5f);
+        glTexCoord2f(1.0f, 1.0f);glVertex3f(w_width/2.0,    w_height/2.0, 0.5f);
+        glTexCoord2f(1.0f, 0.0f);glVertex3f(w_width/2.0,   -w_height/2.0, 0.5f);
     glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
     glFlush();
@@ -345,16 +346,24 @@ void keyboard( unsigned char key, int x, int y ) {
     case 033:exit( EXIT_SUCCESS );
         break;
     case 'w':
-    case 'W':vert_blur_den+=BLUR_STEP;
+    case 'W':
+            vert_blur_den-=BLUR_STEP;
+            vert_blur = 1.0 / vert_blur_den;
         break;
     case 's':
-    case 'S':vert_blur_den-= BLUR_STEP;
+    case 'S':
+            vert_blur_den+= BLUR_STEP;
+            vert_blur = 1.0 / vert_blur_den;
         break;
     case 'd':
-    case 'D':horz_blur_den+= BLUR_STEP;
+    case 'D':
+            horz_blur_den-= BLUR_STEP;
+            horz_blur = 1.0 / horz_blur_den;
         break;
     case 'a':
-    case 'A': horz_blur_den-= BLUR_STEP;
+    case 'A':
+            horz_blur_den+= BLUR_STEP;
+            horz_blur = 1.0 / horz_blur_den;
         break;
     }
     display();
