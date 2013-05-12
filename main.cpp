@@ -14,6 +14,10 @@
 #endif
 #include <iostream>	
 #include <stdexcept>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include "OBJLoader.h"
 #include "ShaderSetup.h"
 
@@ -87,7 +91,7 @@ GLfloat horz_blur_den = 256.0;
 GLfloat vert_blur = 1.0 / vert_blur_den;
 GLfloat horz_blur = 1.0 / horz_blur_den;
 GLfloat threshold = 1.5;
-
+GLfloat gaussianKernelWidth = 0.8;
 // Muted material properties
 GLfloat ad_red[]   = { 0.6, 0.0, 0.0, 1.0 };
 GLfloat ad_green[] = { 0.0, 0.6, 0.2, 1.0 };
@@ -97,6 +101,9 @@ GLfloat ad_blue[]  = { 0.0, 0.0, 0.7, 1.0 };
 GLfloat pos[] = { 10.0, 10.0, 0.0, 0.0 };
 GLfloat amb[] = { 0.9, 0.9, 0.9, 1.0 };
 GLfloat spec[] = { 1.0, 1.0, 1.0, 1.0 };
+
+// Gaussian weights
+GLfloat gaussWeights[] = {0.05, 0.09, 0.12, 0.15, 0.16, 0.15, 0.12, 0.09, 0.05};
 
 GLint shiny1 = 10;
 GLint shiny2 = 40;
@@ -110,6 +117,9 @@ extern "C" {
 // Drawing method used by GLUTS callback
 //------------------------------------------------------------------------------
 void display(){
+    // For passing in gaussian weights to vertical and horizontal shader passes for blur
+    GLuint weights;
+    
     
     /* Initial Rendering Pass.
      * No post processing is done here.
@@ -197,8 +207,12 @@ void display(){
     // Get uniforms
     GLuint pass_1  = glGetUniformLocation(vert_blur_shader, "tex");
     GLuint blur_sv = glGetUniformLocation(vert_blur_shader, "gaus_vert_r");
+    weights = glGetUniformLocation(vert_blur_shader, "gaussWeights");
+    
     glUniform1i(pass_1, 0);
     glUniform1f(blur_sv, vert_blur);
+    glUniform1fv(weights, 9, gaussWeights);
+    
     
     glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f);glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
@@ -238,8 +252,12 @@ void display(){
     // Get uniforms
     GLuint pass_2  = glGetUniformLocation(horz_blur_shader, "tex");
     GLuint blur_sh = glGetUniformLocation(horz_blur_shader, "gaus_horz_r");
+    weights = glGetUniformLocation(horz_blur_shader, "gaussWeights");
+    
     glUniform1i(pass_2, 0);
     glUniform1f(blur_sh, horz_blur);
+    glUniform1fv(weights, 9, gaussWeights);
+    
     
     glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 0.0f);glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
@@ -374,8 +392,15 @@ void reshape( int width, int height ) {
 
 
 
-
-
+// Gaussian function
+//------------------------------------------------------------------------------
+float gauss(int r){
+    float factor = 1 / sqrt(2 * M_PI * gaussianKernelWidth * gaussianKernelWidth);
+    
+    float exponent = -1 * ( (r * r) / (2 * gaussianKernelWidth * gaussianKernelWidth) );
+    
+    return factor * exp(exponent);
+}
 
 // Handle Keyboard input - GLUT callback
 //------------------------------------------------------------------------------
@@ -429,6 +454,35 @@ void keyboard( unsigned char key, int x, int y ) {
             vert_blur_den+= BLUR_STEP;
             vert_blur = 1.0 / vert_blur_den;
         break;
+    
+    // Gaussian kernel width
+    case 'o':
+    case 'O':
+            if (gaussianKernelWidth > 0.1) {
+                gaussianKernelWidth -= 0.1;
+                
+                // Recalculate kernels
+                gaussWeights[0] = gaussWeights[8] = gauss(4);
+                gaussWeights[1] = gaussWeights[7] = gauss(3);
+                gaussWeights[2] = gaussWeights[6] = gauss(2);
+                gaussWeights[3] = gaussWeights[5] = gauss(1);
+                gaussWeights[4] = gauss(0);
+            }
+    break;
+    case 'p':
+    case 'P':
+            if (gaussianKernelWidth < 10.0) {
+                gaussianKernelWidth += 0.1;
+                
+                // Recalculate kernels
+                // Recalculate kernels
+                gaussWeights[0] = gaussWeights[8] = gauss(4);
+                gaussWeights[1] = gaussWeights[7] = gauss(3);
+                gaussWeights[2] = gaussWeights[6] = gauss(2);
+                gaussWeights[3] = gaussWeights[5] = gauss(1);
+                gaussWeights[4] = gauss(0);
+            }
+    break;
     }
     display();
 }
@@ -742,7 +796,7 @@ int main( int argc,  const char *argv[] ) {
 		glutDisplayFunc(display);
 		glutKeyboardFunc(keyboard);
         glutReshapeFunc(reshape);
-        glutTimerFunc(100, callback, 100);
+        //glutTimerFunc(100, callback, 100);
 		glutMainLoop();
 		return(0);
 	} catch( std::runtime_error& err ) {
