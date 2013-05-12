@@ -21,18 +21,21 @@ GLuint fbo;             // The frame buffer object
 GLuint fbo_depth;		// The depth buffer for the frame buffer object
 GLuint init_texture;	// The texture object to write our frame buffer object to
 
-
 GLuint fbo2;            // The second frame buffer object
 GLuint fbo2_depth;      // The second depth buffer object
 GLuint second_texture;  // The second texture object
 
-GLuint fbo3;            // The second frame buffer object
-GLuint fbo3_depth;      // The second depth buffer object
-GLuint third_texture;   // The second texture object
+GLuint fbo3;            // The third frame buffer object
+GLuint fbo3_depth;      // The third depth buffer object
+GLuint third_texture;   // The third texture object
 
-GLuint fbo4;            // The second frame buffer object
-GLuint fbo4_depth;      // The second depth buffer object
-GLuint fourth_texture;   // The second texture object
+GLuint fbo4;            // The fourth frame buffer object
+GLuint fbo4_depth;      // The fourth depth buffer object
+GLuint fourth_texture;  // The fourth texture object
+
+GLuint fbo5;            // The fifth frame buffer object
+GLuint fbo5_depth;      // The fifth depth buffer object
+GLuint fifth_texture;   // The fifth texture object
 
 #define WINDOW_H 600
 #define WINDOW_W 800
@@ -46,6 +49,9 @@ GLuint fourth_texture;   // The second texture object
 
 #define BLOOM_FRAG "bloom.frag"
 #define BLOOM_VERT "bloom.vert"
+
+#define THRESH_FRAG "threshold.fs"
+#define THRESH_VERT "threshold.vs"
 
 #define VERT_BLUR_FS "gaus_vert.fs"
 #define VERT_BLUR_VS "gaus_vert.vs"
@@ -67,6 +73,7 @@ GLfloat w_height= WINDOW_H;
 
 // The bloom shader
 GLuint bloom_shader;
+GLuint threshold_shader;
 GLuint vert_blur_shader;
 GLuint horz_blur_shader;
 GLuint blend_shader;
@@ -75,10 +82,11 @@ GLuint blend_shader;
 int fb_in_use = 0;
 
 // Control blur
-GLfloat vert_blur_den = 64.0;
-GLfloat horz_blur_den = 64.0;
+GLfloat vert_blur_den = 256.0;
+GLfloat horz_blur_den = 256.0;
 GLfloat vert_blur = 1.0 / vert_blur_den;
 GLfloat horz_blur = 1.0 / horz_blur_den;
+GLfloat threshold = 1.5;
 
 // Muted material properties
 GLfloat ad_red[]   = { 0.6, 0.0, 0.0, 1.0 };
@@ -128,14 +136,46 @@ void display(){
     
     
     
-    
-    
-    
-    
-    
-    
-    
     /** Post Processing: Pass# 1
+     *  This pass creates the image that will be blurred
+     */
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo5);
+    glPushAttrib(GL_VIEWPORT_BIT | GL_ENABLE_BIT);
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+    glOrtho(-w_width/2.0, w_width/2.0, -w_height/2.0, w_height/2.0, -1.0, 1.0);
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, init_texture);
+    
+    // Activate shaders
+    glUseProgram(threshold_shader);
+    
+    // Get uniforms
+    GLuint pass_0  = glGetUniformLocation(vert_blur_shader, "tex");
+    GLuint blur_t = glGetUniformLocation(vert_blur_shader, "threshold");
+    glUniform1i(pass_0, 0);
+    glUniform1f(blur_t, threshold);
+    
+    glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
+        glTexCoord2f(0.0f, 1.0f);glVertex3f(-w_width/2.0,   w_height/2.0, 0.5f);
+        glTexCoord2f(1.0f, 1.0f);glVertex3f(w_width/2.0,    w_height/2.0, 0.5f);
+        glTexCoord2f(1.0f, 0.0f);glVertex3f(w_width/2.0,   -w_height/2.0, 0.5f);
+    glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glFlush();
+    glUseProgram(0);
+    glPopAttrib();
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT,0);
+    
+    
+    
+    /** Post Processing: Pass# 2
      *  This pass provides the gaussion blur (Horizontal)
      */
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo2);
@@ -149,7 +189,7 @@ void display(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, init_texture);
+    glBindTexture(GL_TEXTURE_2D, fifth_texture);
     
     // Activate shaders
     glUseProgram(vert_blur_shader);
@@ -181,7 +221,7 @@ void display(){
     
     
     
-    /** Post Processing: Pass# 2
+    /** Post Processing: Pass# 3
      *  This pass provides the gaussion blur (Verticle)
      */
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo3);
@@ -202,10 +242,10 @@ void display(){
     glUniform1f(blur_sh, horz_blur);
     
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
-    glTexCoord2f(0.0f, 1.0f);glVertex3f(-w_width/2.0,   w_height/2.0, 0.5f);
-    glTexCoord2f(1.0f, 1.0f);glVertex3f(w_width/2.0,    w_height/2.0, 0.5f);
-    glTexCoord2f(1.0f, 0.0f);glVertex3f(w_width/2.0,   -w_height/2.0, 0.5f);
+        glTexCoord2f(0.0f, 0.0f);glVertex3f(-w_width/2.0,  -w_height/2.0, 0.5f);
+        glTexCoord2f(0.0f, 1.0f);glVertex3f(-w_width/2.0,   w_height/2.0, 0.5f);
+        glTexCoord2f(1.0f, 1.0f);glVertex3f(w_width/2.0,    w_height/2.0, 0.5f);
+        glTexCoord2f(1.0f, 0.0f);glVertex3f(w_width/2.0,   -w_height/2.0, 0.5f);
     glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
     glFlush();
@@ -365,6 +405,30 @@ void keyboard( unsigned char key, int x, int y ) {
             horz_blur_den+= BLUR_STEP;
             horz_blur = 1.0 / horz_blur_den;
         break;
+            
+    // Even bloom increase
+    case 'x':
+    case 'X':
+            // Equalize so that when we go to change them they are the same
+            horz_blur = vert_blur;
+            
+            horz_blur_den-= BLUR_STEP;
+            horz_blur = 1.0 / horz_blur_den;
+            
+            vert_blur_den-= BLUR_STEP;
+            vert_blur = 1.0 / vert_blur_den;
+            break;
+            
+    // Even bloom decrease
+    case 'z':
+    case 'Z':
+            horz_blur = vert_blur;
+            horz_blur_den+= BLUR_STEP;
+            horz_blur = 1.0 / horz_blur_den;
+            
+            vert_blur_den+= BLUR_STEP;
+            vert_blur = 1.0 / vert_blur_den;
+        break;
     }
     display();
 }
@@ -420,6 +484,12 @@ void initFrameBufferDepthBuffer(void) {
 	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, w_width, w_height);
     glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo4_depth);
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+    
+    glGenRenderbuffersEXT(1, &fbo5_depth);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbo5_depth);
+	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, w_width, w_height);
+    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo5_depth);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 }
 
 
@@ -461,6 +531,15 @@ void initFrameBufferTexture(void) {
     
     glGenTextures(1, &fourth_texture);
 	glBindTexture(GL_TEXTURE_2D, fourth_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w_width, w_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+    
+    glGenTextures(1, &fifth_texture);
+	glBindTexture(GL_TEXTURE_2D, fifth_texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w_width, w_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -528,6 +607,19 @@ void initFrameBuffer(void) {
 		exit(0);
 	}
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    
+    
+    glGenFramebuffersEXT(1, &fbo5);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo5);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, fifth_texture, 0);
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, fbo5_depth);
+	GLenum fbo5_status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	if (fbo5_status != GL_FRAMEBUFFER_COMPLETE_EXT)
+	{
+		std::cout << "Couldn't create fifth frame buffer" << std::endl;
+		exit(0);
+	}
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
 
@@ -565,6 +657,7 @@ void init( void ) {
     
     // Load shader
     GLuint bloom_shader_error = 0;
+    GLuint threshold_shader_error = 0;
     GLuint vert_blur_shader_error = 0;
     GLuint horz_blur_shader_error = 0;
     GLuint blend_shader_error = 0;
@@ -577,6 +670,12 @@ void init( void ) {
         exit(1);
     }
     
+    // Load threshold shader
+    threshold_shader = ShaderSetup(THRESH_VERT, THRESH_FRAG, &threshold_shader_error);
+    if (threshold_shader_error != E_NO_ERROR) {
+        fprintf(stderr, "Error in shader - %s\n", ErrorString(threshold_shader_error));
+        exit(1);
+    }
     
     // Load gaussian blur (vertical)
     vert_blur_shader = ShaderSetup(VERT_BLUR_VS, VERT_BLUR_FS, &vert_blur_shader_error);
@@ -593,7 +692,7 @@ void init( void ) {
     }
     
     
-    // Load gaussian blur (horizontal)
+    // Load blending shader
     blend_shader = ShaderSetup(BLEND_VS, BLEND_FS, &blend_shader_error);
     if (blend_shader_error != E_NO_ERROR) {
         fprintf(stderr, "Error in shader - %s\n", ErrorString(blend_shader_error));
