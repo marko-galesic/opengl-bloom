@@ -90,7 +90,7 @@ GLfloat vert_blur_den = 256.0;
 GLfloat horz_blur_den = 256.0;
 GLfloat vert_blur = 1.0 / vert_blur_den;
 GLfloat horz_blur = 1.0 / horz_blur_den;
-GLfloat threshold = 1.5;
+GLfloat threshold = 1.5;                    // Point where we will blur with respect to r + g + b of a fragment
 GLfloat gaussianKernelWidth = 0.8;
 // Muted material properties
 GLfloat ad_red[]   = { 0.6, 0.0, 0.0, 1.0 };
@@ -166,8 +166,8 @@ void display(){
     glUseProgram(threshold_shader);
     
     // Get uniforms
-    GLuint pass_0  = glGetUniformLocation(vert_blur_shader, "tex");
-    GLuint blur_t = glGetUniformLocation(vert_blur_shader, "threshold");
+    GLuint pass_0  = glGetUniformLocation(threshold_shader, "tex");
+    GLuint blur_t = glGetUniformLocation(threshold_shader, "threshold");
     glUniform1i(pass_0, 0);
     glUniform1f(blur_t, threshold);
     
@@ -401,6 +401,7 @@ float gauss(int r){
     
     return factor * exp(exponent);
 }
+    
 
 // Handle Keyboard input - GLUT callback
 //------------------------------------------------------------------------------
@@ -410,21 +411,29 @@ void keyboard( unsigned char key, int x, int y ) {
     case 'Q':
     case 033:exit( EXIT_SUCCESS );
         break;
+    
+    // Increase vertical blur
     case 'w':
     case 'W':
             vert_blur_den-=BLUR_STEP;
             vert_blur = 1.0 / vert_blur_den;
         break;
+            
+    // Decrease vertical blur
     case 's':
     case 'S':
             vert_blur_den+= BLUR_STEP;
             vert_blur = 1.0 / vert_blur_den;
         break;
+            
+    // Increase horizontal blur
     case 'd':
     case 'D':
             horz_blur_den-= BLUR_STEP;
             horz_blur = 1.0 / horz_blur_den;
         break;
+            
+    // Decrease horizontal blur
     case 'a':
     case 'A':
             horz_blur_den+= BLUR_STEP;
@@ -483,6 +492,22 @@ void keyboard( unsigned char key, int x, int y ) {
                 gaussWeights[4] = gauss(0);
             }
     break;
+    
+    // Blur threshold decrease
+    case 'r':
+    case 'R':
+            if (threshold > 0.0) {
+                threshold -= 0.1;
+            }
+            break;
+            
+    // Blur threshold increase
+    case 't':
+    case 'T':
+            if (threshold < 3.0) {
+                threshold += 0.1;
+            }
+            break;
     }
     display();
 }
