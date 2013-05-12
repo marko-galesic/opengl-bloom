@@ -14,7 +14,7 @@ void main()
     // blur in X
     float r = -radius;
     
-    
+    /* Some code used from http://www.gamerendering.com/2008/10/11/gaussian-blur-filter-shader/ */
     while( r <= radius )
     {
         sum += texture2D(tex, vec2(gl_TexCoord[0].s, gl_TexCoord[0].t + r * gaus_vert_r)) * gaussWeights[int(r + radius)];
