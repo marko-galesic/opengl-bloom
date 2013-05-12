@@ -92,6 +92,8 @@ GLfloat vert_blur = 1.0 / vert_blur_den;
 GLfloat horz_blur = 1.0 / horz_blur_den;
 GLfloat threshold = 1.5;                    // Point where we will blur with respect to r + g + b of a fragment
 GLfloat gaussianKernelWidth = 0.8;
+GLfloat blurRadius = 4.0;
+
 // Muted material properties
 GLfloat ad_red[]   = { 0.6, 0.0, 0.0, 1.0 };
 GLfloat ad_green[] = { 0.0, 0.6, 0.2, 1.0 };
@@ -119,6 +121,9 @@ extern "C" {
 void display(){
     // For passing in gaussian weights to vertical and horizontal shader passes for blur
     GLuint weights;
+    
+    // For passing in blur radius
+    GLuint radius;
     
     
     /* Initial Rendering Pass.
@@ -208,10 +213,12 @@ void display(){
     GLuint pass_1  = glGetUniformLocation(vert_blur_shader, "tex");
     GLuint blur_sv = glGetUniformLocation(vert_blur_shader, "gaus_vert_r");
     weights = glGetUniformLocation(vert_blur_shader, "gaussWeights");
+    radius = glGetUniformLocation(vert_blur_shader, "radius");
     
     glUniform1i(pass_1, 0);
     glUniform1f(blur_sv, vert_blur);
     glUniform1fv(weights, 9, gaussWeights);
+    glUniform1f(radius, blurRadius);
     
     
     glBegin(GL_QUADS);
@@ -253,10 +260,12 @@ void display(){
     GLuint pass_2  = glGetUniformLocation(horz_blur_shader, "tex");
     GLuint blur_sh = glGetUniformLocation(horz_blur_shader, "gaus_horz_r");
     weights = glGetUniformLocation(horz_blur_shader, "gaussWeights");
+    radius = glGetUniformLocation(horz_blur_shader, "radius");
     
     glUniform1i(pass_2, 0);
     glUniform1f(blur_sh, horz_blur);
     glUniform1fv(weights, 9, gaussWeights);
+    glUniform1f(radius, blurRadius);
     
     
     glBegin(GL_QUADS);
@@ -506,6 +515,18 @@ void keyboard( unsigned char key, int x, int y ) {
     case 'T':
             if (threshold < 3.0) {
                 threshold += 0.1;
+            }
+            break;
+    case 'n':
+    case 'N':
+            if (blurRadius > 1.0){
+                blurRadius -= 1.0;
+            }
+            break;
+    case 'm':
+    case 'M':
+            if (blurRadius < 11.0) {
+                blurRadius += 1.0;
             }
             break;
     }
