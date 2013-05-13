@@ -1,0 +1,70 @@
+###############################################################################
+File: Readme
+Author: Frederick Kelch
+Author: Marko Galesic
+###############################################################################
+1.0 - Building
+	1.1 - Makefile
+	1.2 - Required libraries
+	1.3 - Updating library paths
+2.0 - Running
+	2.1 - Command line arguments
+	2.2 - Program arguments (while running)
+3.0 - Credits where credits are due
+	3.1 - Vector.hpp & Matrix.hpp
+	3.2 - Gaussion blur algo
+###############################################################################
+1.0 - Building
+
+
+	1.1 - Makefile
+	      In the project directory type make. This will build the program.
+	1.2 - Required libraries
+	      Mac:
+		-framework foundation
+		-framework GLUT
+		-framework OpenGL
+		-lGLEW
+	1.3 - Updating library paths
+	      Frameworks are in their defualt locations for the mac. However,
+	      the librarys in the make file were installed using "brew". If
+	      you are not using the brew system to manage your third party
+	      library you will need to update the following in the makefile.
+	      
+	      CXXLIB = The path to your library
+              CXXINC = The path to your include directory
+###############################################################################
+2.0 - Running
+	
+	2.1 - Command line arguments
+	      The main executable is bloom. It requires an argument to a .OBJ
+	      file it will render.
+
+	      For example:
+	      ./blender blender.obj
+
+	      will render the scene that was used in the class presentation.
+	
+	2.2 - Program arguments
+	      When the scene has been rendered you can control the bloom using
+	      the following:
+
+		w - Increase vertical blur
+		s - Decreases vertical blur
+		a - Decreases the horizontal blur
+		d - Increases the horizontal blur
+		x - Increase blur evenly
+		z - Decreases blur evenly
+		o - Decrease kernel width
+		p - Increase kernel width
+		n - Decreases blur radius
+		m - Increases blur radius
+###############################################################################
+3.0 - Credit where credit is due
+
+	3.1 - Vertex.hpp & Matrix.hpp
+	      iPhone 3D Programming - Both classes were stock code provided
+	      by this book.
+
+	3.2 - Gaussian Blur
+	      http://www.gamerendering.com/2008/10/11/gaussian-blur-filter-shader/

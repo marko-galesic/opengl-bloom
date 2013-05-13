@@ -17,7 +17,7 @@ OBJLoader::~OBJLoader()
 }
 
 
-//
+// Read the .OBJ file
 //-----------------------------------------------------------------------------
 void OBJLoader::loadOBJ( const std::string& fname )
 {
@@ -80,6 +80,9 @@ void OBJLoader::loadOBJ( const std::string& fname )
 }//End method
 
 
+
+// Generate a call list with the given object.
+//------------------------------------------------------------------------------
 GLuint OBJLoader::generateDrawList(){
     GLuint listNumber = glGenLists(1);
     glNewList(listNumber, GL_COMPILE);
